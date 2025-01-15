@@ -83,11 +83,17 @@ namespace NewsAPI.Controllers
         // POST: api/News
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public ActionResult<News> PostNews(News news)
+        
+        public ActionResult<News> PostNews([FromQuery] News news, IFormFile? file)
         {
             try
             {
-                var newNews = _repository.Add(news);
+                if (file != null && file.ContentType != "image/jpeg" && file.ContentType != "image/jpg" &&
+                    file.ContentType != "image/png")
+                {
+                    return BadRequest();
+                }
+                var newNews = _repository.Add(news, file);
                 if (newNews != null) 
                 {
                     return CreatedAtAction("GetNews", new { id = news.Id }, news);
