@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NewsAPI.Data;
 using NewsAPI.Model;
+using NewsAPI.Repositories;
+using NewsAPI.Utilities;
 
 namespace NewsAPI.Controllers
 {
@@ -14,95 +17,108 @@ namespace NewsAPI.Controllers
     [ApiController]
     public class NewsController : ControllerBase
     {
-        private readonly NewsAPIContext _context;
+        private readonly INewsRepository _repository;
 
-        public NewsController(NewsAPIContext context)
+        public NewsController(INewsRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
         // GET: api/News
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<News>>> GetNews()
+        public ActionResult<IEnumerable<News>> GetNews()
         {
-            return await _context.News.ToListAsync();
+            try
+            {
+                var news = _repository.GetAll();
+                return Ok(news);
+            }
+            catch (Exception ex) 
+            {
+                return StatusCode(500, ex.Message);
+            }
+            
         }
 
         // GET: api/News/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<News>> GetNews(int id)
+        public ActionResult<News> GetNews(int id)
         {
-            var news = await _context.News.FindAsync(id);
-
-            if (news == null)
+            try
             {
-                return NotFound();
+                var news = _repository.Get(x => x.Id == id);
+                return Ok(news);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
 
-            return news;
         }
 
         // PUT: api/News/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutNews(int id, News news)
+        public ActionResult<News> PutNews(int id, News modifiedNews)
         {
-            if (id != news.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(news).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!NewsExists(id))
+                News news = _repository.Get(x => x.Id == id);
+                if (news == null)
                 {
                     return NotFound();
                 }
-                else
-                {
-                    throw;
-                }
+                news.Title = modifiedNews.Title;
+                news.Body = modifiedNews.Body;
+                news.ImageUrl = modifiedNews.ImageUrl;
+                _repository.Update(news);
+                return Ok(news);
             }
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         // POST: api/News
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<News>> PostNews(News news)
+        public ActionResult<News> PostNews(News news)
         {
-            _context.News.Add(news);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetNews", new { id = news.Id }, news);
+            try
+            {
+                var newNews = _repository.Add(news);
+                if (newNews != null) 
+                {
+                    return CreatedAtAction("GetNews", new { id = news.Id }, news);
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+            return StatusCode(500, "Error creating news");
         }
 
         // DELETE: api/News/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteNews(int id)
+        public IActionResult DeleteNews(int id)
         {
-            var news = await _context.News.FindAsync(id);
-            if (news == null)
+            try
             {
-                return NotFound();
+                News news = _repository.Get(x => x.Id == id);
+                if (news == null)
+                {
+                    return NotFound();
+                }
+                _repository.Delete(news);
+                return NoContent();
             }
-
-            _context.News.Remove(news);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
-        private bool NewsExists(int id)
-        {
-            return _context.News.Any(e => e.Id == id);
-        }
     }
 }
