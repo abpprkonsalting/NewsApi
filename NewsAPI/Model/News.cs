@@ -3,9 +3,9 @@
     public class News
     {
         public int Id { get; set; }
-        public int Title { get; set; }
-        public int Body { get; set; }
-        public int ImageUrl { get; set; }
+        public string Title { get; set; } = "";
+        public string Body { get; set; } = "";
+        public string ImageUrl { get; set; } = "";
 
     }
 }

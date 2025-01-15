@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NewsAPI.Data;
 
@@ -10,9 +11,11 @@ using NewsAPI.Data;
 namespace NewsAPI.Migrations
 {
     [DbContext(typeof(NewsAPIContext))]
-    partial class NewsAPIContextModelSnapshot : ModelSnapshot
+    [Migration("20250115153434_Correct_News_Entity_Properties_Types")]
+    partial class Correct_News_Entity_Properties_Types
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
