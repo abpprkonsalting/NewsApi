@@ -58,12 +58,12 @@ namespace NewsAPI.Controllers
 
         // PUT: api/News/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public ActionResult<News> PutNews(int id, News modifiedNews)
+        [HttpPut]
+        public ActionResult<News> PutNews([FromQuery] News modifiedNews)
         {
             try
             {
-                News news = _repository.Get(x => x.Id == id);
+                News news = _repository.Get(x => x.Id == modifiedNews.Id);
                 if (news == null)
                 {
                     return NotFound();
@@ -83,7 +83,6 @@ namespace NewsAPI.Controllers
         // POST: api/News
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        
         public ActionResult<News> PostNews([FromQuery] News news, IFormFile? file)
         {
             try
