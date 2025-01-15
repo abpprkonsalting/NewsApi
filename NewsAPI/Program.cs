@@ -1,4 +1,9 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using NewsAPI.Data;
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<NewsAPIContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("NewsAPIContext") ?? throw new InvalidOperationException("Connection string 'NewsAPIContext' not found.")));
 
 // Add services to the container.
 
