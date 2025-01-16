@@ -58,20 +58,23 @@ namespace NewsAPI.Controllers
 
         // PUT: api/News/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public ActionResult<News> PutNews(int id, News modifiedNews)
+        [HttpPut]
+        public ActionResult<News> PutNews([FromQuery] News modifiedNews, IFormFile? file)
         {
             try
             {
-                News news = _repository.Get(x => x.Id == id);
+                if (file != null && ContentTypeIsImage(file))
+                {
+                    return BadRequest();
+                }
+                News news = _repository.Get(x => x.Id == modifiedNews.Id);
                 if (news == null)
                 {
                     return NotFound();
                 }
                 news.Title = modifiedNews.Title;
                 news.Body = modifiedNews.Body;
-                news.ImageUrl = modifiedNews.ImageUrl;
-                _repository.Update(news);
+                _repository.Update(news, file);
                 return Ok(news);
             }
             catch (Exception ex)
@@ -83,13 +86,11 @@ namespace NewsAPI.Controllers
         // POST: api/News
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        
         public ActionResult<News> PostNews([FromQuery] News news, IFormFile? file)
         {
             try
             {
-                if (file != null && file.ContentType != "image/jpeg" && file.ContentType != "image/jpg" &&
-                    file.ContentType != "image/png")
+                if (file != null && !ContentTypeIsImage(file))
                 {
                     return BadRequest();
                 }
@@ -124,6 +125,16 @@ namespace NewsAPI.Controllers
             {
                 return StatusCode(500, ex.Message);
             }
+        }
+
+        private bool ContentTypeIsImage(IFormFile file)
+        {
+            if (file.ContentType != "image/jpeg" && file.ContentType != "image/jpg" &&
+                    file.ContentType != "image/png")
+            {
+                return false;
+            }
+            return true;
         }
 
     }
