@@ -19,11 +19,7 @@ namespace NewsAPI.Repositories
             {
                 if (file != null)
                 {
-                    string pathToSave = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images\\");
-                    string fullPath = Path.Combine(pathToSave, file.FileName);
-                    using FileStream stream = new(fullPath, FileMode.Create);
-                    file.CopyTo(stream);
-                    news.ImageUrl = "images/" + file.FileName;
+                    news.ImageUrl = SaveImage(file);
                 }
                 return Update(news);
             }
@@ -39,17 +35,29 @@ namespace NewsAPI.Repositories
             {
                 if (file != null)
                 {
-                    string pathToSave = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images\\");
-                    string fullPath = Path.Combine(pathToSave, file.FileName);
-                    using FileStream stream = new(fullPath, FileMode.Create);
-                    file.CopyTo(stream);
-                    news.ImageUrl = "images/" + file.FileName;
+                    news.ImageUrl = SaveImage(file);
                 }
                 return Add(news);
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
+            }
+        }
+
+        private string SaveImage(IFormFile file)
+        {
+            try
+            {
+                string pathToSave = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images\\");
+                string fullPath = Path.Combine(pathToSave, file.FileName);
+                using FileStream stream = new(fullPath, FileMode.Create);
+                file.CopyTo(stream);
+                return "images/" + file.FileName;
+            }
+            catch (Exception ex)
+            {
+                return "images/default_image.png";
             }
         }
     }
