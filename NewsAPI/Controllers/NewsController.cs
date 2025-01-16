@@ -59,10 +59,15 @@ namespace NewsAPI.Controllers
         // PUT: api/News/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
-        public ActionResult<News> PutNews([FromQuery] News modifiedNews)
+        public ActionResult<News> PutNews([FromQuery] News modifiedNews, IFormFile? file)
         {
             try
             {
+                if (file != null && file.ContentType != "image/jpeg" && file.ContentType != "image/jpg" &&
+                    file.ContentType != "image/png")
+                {
+                    return BadRequest();
+                }
                 News news = _repository.Get(x => x.Id == modifiedNews.Id);
                 if (news == null)
                 {
@@ -70,8 +75,7 @@ namespace NewsAPI.Controllers
                 }
                 news.Title = modifiedNews.Title;
                 news.Body = modifiedNews.Body;
-                news.ImageUrl = modifiedNews.ImageUrl;
-                _repository.Update(news);
+                _repository.Update(news, file);
                 return Ok(news);
             }
             catch (Exception ex)
