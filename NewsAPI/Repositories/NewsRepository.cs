@@ -1,4 +1,4 @@
-using NewsAPI.Data;
+﻿using NewsAPI.Data;
 using NewsAPI.Model;
 
 namespace NewsAPI.Repositories
@@ -47,12 +47,10 @@ namespace NewsAPI.Repositories
                 }
                 return Add(news);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
-            
-            
         }
     }
 }
