@@ -90,7 +90,7 @@ namespace NewsAPI.Controllers
         {
             try
             {
-                if (file != null && ContentTypeIsImage(file))
+                if (file != null && !ContentTypeIsImage(file))
                 {
                     return BadRequest();
                 }
