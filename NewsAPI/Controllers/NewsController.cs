@@ -63,8 +63,7 @@ namespace NewsAPI.Controllers
         {
             try
             {
-                if (file != null && file.ContentType != "image/jpeg" && file.ContentType != "image/jpg" &&
-                    file.ContentType != "image/png")
+                if (file != null && ContentTypeIsImage(file))
                 {
                     return BadRequest();
                 }
@@ -91,8 +90,7 @@ namespace NewsAPI.Controllers
         {
             try
             {
-                if (file != null && file.ContentType != "image/jpeg" && file.ContentType != "image/jpg" &&
-                    file.ContentType != "image/png")
+                if (file != null && ContentTypeIsImage(file))
                 {
                     return BadRequest();
                 }
@@ -127,6 +125,16 @@ namespace NewsAPI.Controllers
             {
                 return StatusCode(500, ex.Message);
             }
+        }
+
+        private bool ContentTypeIsImage(IFormFile file)
+        {
+            if (file.ContentType != "image/jpeg" && file.ContentType != "image/jpg" &&
+                    file.ContentType != "image/png")
+            {
+                return false;
+            }
+            return true;
         }
 
     }
